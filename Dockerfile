@@ -38,6 +38,7 @@ RUN apt-get update && \
     wget \
     python-dev \
     python-pip \
+    python-setuptools \
     python-vtk6 \
     #python3-vtk7 \
     #libvtk7.1 \
