@@ -30,7 +30,7 @@ For [Windows](https://docs.docker.com/docker-for-windows/install/#download-docke
 ### Users
 If you're a Chaste user and want to get up and running with the latest release fully compiled and ready to go, after installing and configuring Docker simply run:
 ```
-docker run -it --name chaste -v chaste_data:/home/chaste bdevans/chaste-docker:2017.1
+docker run -it --rm -v chaste_data:/home/chaste bdevans/chaste-docker:2017.1
 ```
 This should present you with a bash prompt within an isolated Docker container with all the dependencies and pre-compiled code you need to start building your own Chaste projects. If you don't already have a project, just use the provided script `new_project.sh` to create a project template in `~/projects` as a starting point. Many tutorials for projects can be found here: https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials.
 
@@ -56,10 +56,18 @@ If you're a Chaste developer and want to build your own image with a particular 
 
 2. Launch the container:
     ```
-    docker run -it --name chaste -v chaste_data:/home/chaste chaste
+    docker run -it --rm -v chaste_data:/home/chaste chaste
     ```
-    (Or run `docker run -it --name chaste -v chaste_data:/home/chaste chaste:2017` if you tagged your image name as above.)
+    (Or run `docker run -it --rm -v chaste_data:/home/chaste chaste:2017` if you tagged your image name as above.)
     The first time will take a little longer than usual as the volume has to be populated with data. For information on accessing the contents of this volume, see [below](#accessing-volume-data).
+
+Once the container has successfully launched, you should see a command prompt a bit like this:
+
+```
+chaste@301291afbedf:~$
+```
+
+In here you can build and test your projects without interfering with the rest of your system. You may also find it useful to open another terminal and run `docker stats` so you can see system resource usage for your running containers. When you are finished with the container, simply type `exit` to close it.
 
 Container directory structure
 -----------------------------
@@ -83,7 +91,7 @@ These folders contain the following types of data:
 - `src`: the Chaste source code
 - `testoutput`: the output folder for the project testing framework (set with `$CHASTE_TEST_OUTPUT`)
 
-Any changes made in the home folder (`/home/chaste`) will persist between restarting containers as it is designated as a `VOLUME`. Additionally, specific folders may be mounted over any of these subfolders, for example, to gain access to the test outputs for visualising in ParaView or for mounting a different version of the Chaste source code. 
+Any changes made in the home folder (`/home/chaste`) will persist between restarting containers as it is designated as a `VOLUME`. Additionally, specific folders may be mounted over any of these subfolders, for example, to gain access to the test outputs for visualising in ParaView or for mounting a different version of the Chaste source code.
 
 Mounting host directories
 -------------------------
@@ -92,9 +100,9 @@ Any host directory (specified with an absolute path) may be mounted in the conta
 
 | Operating System         | Command                                                       |
 | ------------------------ | ------------------------------------------------------------- |
-| Linux & macOS (*nix)     | `docker run -it --name chaste -v chaste_data:/home/chaste -v $(pwd)/projects:/home/chaste/projects -v $(pwd)/testoutput:/home/chaste/testoutput chaste` |
-| Windows (PowerShell<sup>[[2]](#FN2)</sup>) | `docker run -it --name chaste -v chaste_data:/home/chaste -v ${PWD}/projects:/home/chaste/projects -v ${PWD}/testoutput:/home/chaste/testoutput chaste` |
-| Windows (Command Prompt) | `docker run -it --name chaste -v chaste_data:/home/chaste -v %cd%/projects:/home/chaste/projects -v %cd%/testoutput:/home/chaste/testoutput chaste`     |
+| Linux & macOS (*nix)     | `docker run -it --rm -v chaste_data:/home/chaste -v $(pwd)/projects:/home/chaste/projects -v $(pwd)/testoutput:/home/chaste/testoutput chaste` |
+| Windows (PowerShell [[2]](#FN2)) | `docker run -it --rm -v chaste_data:/home/chaste -v ${PWD}/projects:/home/chaste/projects -v ${PWD}/testoutput:/home/chaste/testoutput chaste` |
+| Windows (Command Prompt) | `docker run -it --rm -v chaste_data:/home/chaste -v %cd%/projects:/home/chaste/projects -v %cd%/testoutput:/home/chaste/testoutput chaste`     |
 
 Accessing volume data
 ---------------------
@@ -116,7 +124,7 @@ On a Linux host, the `chaste_data` volume contents may be directly accessed at `
 ln -s /var/lib/docker/volumes/chaste_data/_data chaste_data
 ```
 
-The situation is less straightforward for Windows and macOS<sup>[[1]](#FN1)</sup> hosts due to the intermediary Linux virtual machine (Moby based on Alpine Linux) in which images, containers and volumes are stored.
+The situation is less straightforward for Windows and macOS [[1]](#FN1) hosts due to the intermediary Linux virtual machine (Moby based on Alpine Linux) in which images, containers and volumes are stored.
 
 1. For more extensive editing, files may be copied out of the volume, edited on the host, then copied back in with [`docker cp`](https://docs.docker.com/engine/reference/commandline/cp/). For example use the following commands to copy the whole folder, where the container has been labelled `chaste` with the `docker run` argument `--name chaste`:
     ```
@@ -136,7 +144,7 @@ Firstly, make sure you have given Docker at least 4GB RAM, especially if you com
 
 If you get a message beginning: `Unexpected end of /proc/mounts line ...`, this can be safely ignored!
 
-If you ran a container before but it now refuses to launch with an error message like below, it's because you need to remove the container before one can be recreated with the same name.
+If you ran a container before and explicitly gave it a name (e.g. using `--name chaste` as an argument to `docker run`) but it now refuses to launch with an error message like below, it's because you need to remove the existing (stopped) container before one can be recreated with the same name.
 
 ```
 docker: Error response from daemon: Conflict. The container name "/chaste" is already in use by container "1711bce2674e399b6084c6d452857377f6ed4dd8ee3aa19460de00fac7b86bc7". You have to remove (or rename) that container to be able to reuse that name.
@@ -147,6 +155,8 @@ To remove the container, simply run the following command then rerun the `docker
 ```
 docker rm chaste
 ```
+
+N.B. You can find out the names of existing containers (and their status) with the command: `docker ps -a`.
 
 If building the image from scratch, occasionally problems can occur if a dependency fails to download and install correctly. If such an issue occurs, try resetting your Docker environment (i.e. remove all containers, images and their intermediate layers) with the following command:
 ```
@@ -161,6 +171,8 @@ docker volume rm <volume_name>
 ```
 
 For more information on cleaning up Docker, see [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes).
+
+For more general troubleshooting, opening a terminal and running `docker events` then launching the container in another terminal will provide logging information of the events happening behind the scenes.
 
 Testing
 -------
@@ -186,27 +198,26 @@ Note that packages installed this way will not persist after the container is sh
 Notes
 -----
 
-<a name=FN1>[1]</a>: On macOS the Linux virtual machine which hosts the containers can be inspected with the command:
+- <a name=FN1>[1]</a>: On macOS the Linux virtual machine which hosts the containers can be inspected with the command:
 ```
 screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
 ```
-
-<a name=FN2>[2]</a>: If you are using PowerShell, you can enable tab completion by installing the PowerShell module [`posh-docker`](https://docs.docker.com/docker-for-windows/#set-up-tab-completion-in-powershell). Similarly, for tab completion of git commands in PowerShell, install [`posh-git`](https://git-scm.com/book/uz/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Powershell).
+- <a name=FN2>[2]</a>: If you are using PowerShell, you can enable tab completion by installing the PowerShell module [`posh-docker`](https://docs.docker.com/docker-for-windows/#set-up-tab-completion-in-powershell). Similarly, for tab completion of git commands in PowerShell, install [`posh-git`](https://git-scm.com/book/uz/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Powershell).
 
 Benchmarks
 ----------
 
 Running the continuous test pack (`test.sh`):
 
-| OS        | Chaste src in Volume | Chaste src on host | Difference |
-| --------- | --------------------:| ------------------:|:---------- |
-| Linux 1   |                      |                    |            |
-| macOS 2   |                      |                    |            |
-| Windows 3 | 19m21.260s           | 6m48.780s          | -64.8%     |
+| OS                  | src in Volume | src on host | Difference |
+| ------------------- | -------------:| -----------:|:---------- |
+| Linux [[1]](#BM1)   |               |             |            |
+| macOS [[2]](#BM2)   |               |             |            |
+| Windows [[3]](#BM3) | 19m21.260s    | 6m48.780s   | -64.8%     |
 
-1:
-2: macOS 10.13.5; Intel i7 @ 3.1GHz; 8GB (of 16GB) RAM. Docker: 18.03.1-ce-mac65 (24312)
-3: Windows 10; Intel i7 6700 CPU @ 3.40GHz; 8GB (of 64GB) RAM. Docker: 18.03.1-ce-win65 (17513)
+- <a name=BM1>[1]</a>: Ubuntu 18.04 LTS;
+- <a name=BM2>[2]</a>: macOS 10.13.5; Intel i7 @ 3.1GHz; 8GB (of 16GB) RAM. Docker: 18.03.1-ce-mac65 (24312)
+- <a name=BM3>[3]</a>: Windows 10; Intel i7 6700 CPU @ 3.40GHz; 8GB (of 64GB) RAM. Docker: 18.03.1-ce-win65 (17513)
 
 TODO
 ----
