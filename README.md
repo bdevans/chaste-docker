@@ -1,7 +1,7 @@
-Chaster
-=======
+Chaste-docker
+=============
 
-*Dockerfiles for Chaste*
+*Docker image for Chaste*
 
 [![Chaste logo](https://chaste.cs.ox.ac.uk/logos/chaste-266x60.jpg "Chaste")](http://www.cs.ox.ac.uk/chaste/)
 [![Docker logo](https://www.docker.com/sites/default/files/horizontal.png)](https://docs.docker.com/)
@@ -11,7 +11,7 @@ Chaster
 
 [Docker](https://docs.docker.com/) is a lightweight virtualisation technology allowing applications with all of their dependencies to be quickly and easily run in a platform-independent manner. This project provides an image containing [Chaste](http://www.cs.ox.ac.uk/chaste/) (and some additional scripts for convenience) which can be launched with a single command, to provide a portable, homogeneous computational environment (across several operating systems and countless hardware configurations) for the simulation of cancer, heart and soft tissue.
 
-<a href="https://docs.docker.com/"><img src="https://www.docker.com/sites/default/files/Container%402x.png" alt="Docker schematic" align="middle" width="402px"/></a>
+[![Docker schematic](https://docs.docker.com/engine/images/architecture.svg)](https://docs.docker.com/)
 
 *Docker container schematic*
 
