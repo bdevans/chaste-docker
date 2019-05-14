@@ -30,7 +30,7 @@ RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
 # Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, eclipse-egit, libsvn-java, subversion, git-svn, gnuplot, paraview
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     chaste-dependencies \
     sudo \
     git \
@@ -38,6 +38,7 @@ RUN apt-get update && \
     wget \
     python-dev \
     python-pip \
+    python-setuptools \
     python-vtk6 \
     #python3-vtk7 \
     #libvtk7.1 \
