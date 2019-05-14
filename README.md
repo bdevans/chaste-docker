@@ -1,3 +1,6 @@
+# IMPORTANT DEPRECATION NOTICE! 
+# THIS REPOSITORY HAS MOVED - PLEASE USE THE NEW LINK: https://github.com/Chaste/chaste-docker
+
 Chaste-docker
 =============
 
